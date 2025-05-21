@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ Sơ Ứng Tuyển</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css" />
+  <link rel="stylesheet" href="styles/profile.css">
+</head>
+<body>
+  <!-- Thanh bên -->
+  <div class="sidebar">
+    <div class="logo">
+      <img src="../images/logo.png" alt="Logo">
+    </div>
+    <ul>
+      <li><a href="#"><i class="fa-solid fa-chart-line"></i> Bảng Điều Khiển</a></li>
+      <li><a href="#"><i class="fa-regular fa-newspaper"></i> Tin Tức</a></li>
+      <li><a href="#" class="active"><i class="fa-solid fa-address-card"></i> Hồ Sơ Ứng Tuyển</a></li>
+      <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất</a></li>
+    </ul>
+  </div>
+
+  <!-- Nội dung chính -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Quản Lý Hồ Sơ Ứng Tuyển</h1>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="filters">
+      <input type="text" class="search-bar" placeholder="Tìm kiếm ứng viên...">
+      <select id="positionFilter">
+        <option value="">- Tất cả vị trí -</option>
+      </select>
+      <button id="applyFilters"><i class="fa-solid fa-filter"></i> Áp dụng</button>
+      <button id="resetFilters"><i class="fa-solid fa-rotate"></i> Đặt lại</button>
+    </div>
+
+    <!-- Danh sách hồ sơ -->
+    <div class="applications">
+      <h3>Danh Sách Hồ Sơ Ứng Tuyển</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Họ và Tên</th>
+            <th>Email</th>
+            <th>Số Điện Thoại</th>
+            <th>Vị Trí Ứng Tuyển</th>
+            <th>Ngày Nộp</th>
+            <th>Trạng Thái</th>
+            <th>Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="pagination"></div>
+    </div>
+  </div>
+
+<script>
+  const API_URL = 'http://localhost:3000/candidates';
+let filteredCandidates = null;
+let currentPage = 1;
+const itemsPerPage = 5;
+
+// Hàm chuẩn hóa ký tự tiếng Việt (loại bỏ dấu)
+function normalizeVietnamese(str) {
+    if (!str) return '';
+    return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+// Hàm hiển thị thông báo
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+}
+
+// Hàm chuyển đổi trạng thái sang lớp CSS
+function getStatusClass(status) {
+    const statusMap = {
+        'Mới': 'moi',
+        'Đang phỏng vấn': 'phong-van',
+        'Đã tuyển dụng': 'duoc-nhan',
+        'Đã từ chối': 'tu-choi'
+    };
+    return statusMap[status] || '';
+}
+
+// Hàm định dạng ngày
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const parts = dateString.split('/');
+    if (parts.length === 3) {
+        const date = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+        return date.toLocaleDateString('vi-VN');
+    }
+    return dateString;
+}
+
+// Hàm xử lý dữ liệu đầu vào để ngăn XSS
+function sanitizeHTML(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// Hàm lấy danh sách ứng viên từ API
+async function fetchCandidates() {
+    try {
+        const response = await fetch(`${API_URL}?hidden=false`);
+        if (!response.ok) throw new Error(`Không thể tải danh sách ứng viên: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        showNotification(`Lỗi khi tải danh sách ứng viên: ${error.message}`, 'error');
+        console.error(error);
+        return [];
+    }
+}
+
+// Hàm hiển thị danh sách vị trí vào bộ lọc
+async function renderPositionFilter() {
+    try {
+        const response = await fetch(`${API_URL}?hidden=false`);
+        if (!response.ok) throw new Error(`Không thể tải danh sách vị trí: ${response.status}`);
+        const data = await response.json();
+        const positions = [...new Set(data.map(c => c.position).filter(Boolean))];
+        const select = document.getElementById('positionFilter');
+        select.innerHTML = `<option value="">- Tất cả vị trí -</option>`;
+        positions.forEach(pos => {
+            select.innerHTML += `<option value="${pos}">${pos}</option>`;
+        });
+    } catch (error) {
+        showNotification(`Lỗi khi tải danh sách vị trí: ${error.message}`, 'error');
+        console.error(error);
+    }
+}
+
+// Hàm hiển thị danh sách ứng viên
+async function displayCandidates(page = 1, data = null) {
+    const tableBody = document.querySelector('tbody');
+    tableBody.textContent = '';
+    const displayData = data || (await fetchCandidates());
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, displayData.length);
+    const paginatedData = displayData.slice(startIndex, endIndex);
+
+    if (paginatedData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Không tìm thấy dữ liệu phù hợp</td></tr>';
+        return;
+    }
+
+    paginatedData.forEach(candidate => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${candidate.id}</td>
+            <td>${sanitizeHTML(candidate.name)}</td>
+            <td>${sanitizeHTML(candidate.email)}</td>
+            <td>${candidate.phone}</td>
+            <td>${sanitizeHTML(candidate.position)}</td>
+            <td>${formatDate(candidate.date)}</td>
+            <td><span class="status ${getStatusClass(candidate.status)}">${candidate.status}</span></td>
+            <td>
+                <div class="action-buttons">
+                    <button class="view" onclick="viewCandidate('${candidate.id}')"><i class="fa-solid fa-eye"></i></button>
+                    <button class="delete" onclick="hideCandidate('${candidate.id}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+
+    updatePagination(page, Math.ceil(displayData.length / itemsPerPage));
+}
+
+// Hàm cập nhật phân trang
+function updatePagination(currentPage, totalPages) {
+    const pagination = document.querySelector('.pagination');
+    pagination.textContent = '';
+    pagination.innerHTML = `
+        <button onclick="changePage(1)"><i class="fa-solid fa-angles-left"></i></button>
+        <button onclick="changePage(${Math.max(1, currentPage - 1)})"><i class="fa-solid fa-angle-left"></i></button>
+    `;
+    const maxVisiblePages = 3;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+    if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    for (let i = startPage; i <= endPage; i++) {
+        pagination.innerHTML += `<button class="${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+    }
+    pagination.innerHTML += `
+        <button onclick="changePage(${Math.min(totalPages, currentPage + 1)})"><i class="fa-solid fa-angle-right"></i></button>
+        <button onclick="changePage(${totalPages})"><i class="fa-solid fa-angles-right"></i></button>
+    `;
+}
+
+// Hàm đổi trang
+function changePage(page) {
+    currentPage = page;
+    displayCandidates(page, filteredCandidates);
+}
+
+// Hàm hiển thị modal chi tiết ứng viên
+async function viewCandidate(id) {
+    try { 
+        const response = await fetch(`${API_URL}/${id}`);
+        if (!response.ok) throw new Error(`Không tìm thấy ứng viên: ${response.status}`);
+        const candidate = await response.json();
+        if (candidate.hidden) return;
+
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close">×</span>
+                <h3>Thông tin chi tiết: ${sanitizeHTML(candidate.name)}</h3>
+                <div class="candidate-details">
+                    <div class="detail-row">
+                        <div class="detail-group">
+                            <label>ID:</label>
+                            <p>${candidate.id}</p>
+                        </div>
+                        
+                        <div class="detail-group">
+                            <label>Trạng thái:</label>
+                            <p><span class="status ${getStatusClass(candidate.status)}">${candidate.status}</span></p>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-group">
+                            <label>Họ tên:</label>
+                            <p>${sanitizeHTML(candidate.name)}</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Email:</label>
+                            <p>${sanitizeHTML(candidate.email)}</p>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-group">
+                            <label>Số điện thoại:</label>
+                            <p>${candidate.phone}</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Giới tính:</label>
+                            <p>${sanitizeHTML(candidate.gender)}</p>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-group">
+                            <label>Ngày sinh:</label>
+                            <p>${formatDate(candidate.birthdate)}</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Vị trí ứng tuyển:</label>
+                            <p>${sanitizeHTML(candidate.position)}</p>
+                        </div>
+                    </div>
+                    <div class="detail-group full">
+                        <label>Địa chỉ:</label>
+                        <p>${sanitizeHTML(candidate.address)}</p>
+                    </div>
+                    <div class="detail-group full">
+                        <label>Ngày nộp hồ sơ:</label>
+                        <p>${formatDate(candidate.date)}</p> </div>
+                    <div class="detail-group full">
+                        <label>Trình độ học vấn:</label>
+                        <p>${sanitizeHTML(candidate.education)}</p>
+                    </div>
+                    <div class="detail-group full">
+                        <label>Kinh nghiệm làm việc:</label>
+                        <p>${sanitizeHTML(candidate.experience)}</p>
+                    </div>
+                    <div class="detail-group full">
+                        <label>Kỹ năng:</label>
+                        <p>${sanitizeHTML(candidate.skills)}</p>
+                    </div>
+                    <div class="detail-group full">
+                        <label>Ghi chú:</label>
+                        <p>${sanitizeHTML(candidate.notes)}</p>
+                    </div>
+                    <div class="detail-group full">
+                        <label>Đổi Trạng thái :</label> 
+                      </div>
+                    <div class="detail-action">
+                        <button class="status-btn moi" onclick="changeStatus('${candidate.id}', 'Mới')">Đánh dấu Mới</button>
+                        <button class="status-btn phong-van" onclick="changeStatus('${candidate.id}', 'Đang phỏng vấn')">Đánh dấu Phỏng vấn</button>
+                        <button class="status-btn duoc-nhan" onclick="changeStatus('${candidate.id}', 'Đã tuyển dụng')">Đánh dấu Tuyển dụng</button>
+                        <button class="status-btn tu-choi" onclick="changeStatus('${candidate.id}', 'Đã từ chối')">Đánh dấu Từ chối</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.querySelector('.close').onclick = () => modal.remove();
+        window.onclick = (event) => {
+            if (event.target === modal) modal.remove();
+        };
+    } catch (error) {
+        showNotification(`Lỗi khi tải thông tin ứng viên: ${error.message}`, 'error');
+        console.error(error);
+    }
+}
+
+// Hàm thay đổi trạng thái
+async function changeStatus(id, newStatus) {
+    const validStatuses = ['Mới', 'Đang phỏng vấn', 'Đã tuyển dụng', 'Đã từ chối'];
+    if (!validStatuses.includes(newStatus)) {
+        showNotification('Trạng thái không hợp lệ', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (!response.ok) throw new Error(`Không thể cập nhật trạng thái: ${response.status}`);
+        document.querySelector('.modal')?.remove();
+        await displayCandidates(currentPage, filteredCandidates);
+        await renderPositionFilter();
+        showNotification(`Đã cập nhật trạng thái thành "${newStatus}"`, 'success');
+        setTimeout(() => {
+        location.reload();
+    }, 1500);
+    } catch (error) {
+        showNotification(`Lỗi khi cập nhật trạng thái: ${error.message}`, 'error');
+        console.error(error);
+    }
+}
+
+// Hàm ẩn ứng viên
+async function hideCandidate(id) {
+    if (confirm('Bạn có chắc chắn muốn ẩn ứng viên này?')) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ hidden: true })
+            });
+            if (!response.ok) throw new Error(`Không thể ẩn ứng viên: ${response.status}`);
+            if (filteredCandidates) {
+                filteredCandidates = filteredCandidates.filter(c => c.id !== id);
+            }
+            await displayCandidates(currentPage, filteredCandidates);
+            await renderPositionFilter();
+            showNotification('Đã ẩn ứng viên thành công', 'success');
+        } catch (error) {
+            showNotification(`Lỗi khi ẩn ứng viên: ${error.message}`, 'error');
+            console.error(error);
+        }
+    }
+}
+
+// Hàm xử lý bộ lọc và tìm kiếm
+async function applyFilters() {
+    const positionFilter = document.getElementById('positionFilter').value;
+    const searchTerm = document.querySelector('.search-bar').value.trim();
+    
+    try {
+        // Lấy tất cả ứng viên không ẩn
+        const response = await fetch(`${API_URL}?hidden=false`);
+        if (!response.ok) throw new Error(`Không thể tải dữ liệu: ${response.status}`);
+        let candidates = await response.json();
+
+        // Lọc theo vị trí nếu có
+        if (positionFilter) {
+            candidates = candidates.filter(c => c.position === positionFilter);
+        }
+
+        // Lọc theo từ khóa tìm kiếm nếu có
+        if (searchTerm) {
+            const normalizedSearchTerm = normalizeVietnamese(searchTerm);
+            candidates = candidates.filter(candidate =>
+                normalizeVietnamese(candidate.name).includes(normalizedSearchTerm) ||
+                normalizeVietnamese(candidate.email).includes(normalizedSearchTerm) ||
+                normalizeVietnamese(candidate.id).includes(normalizedSearchTerm) ||
+                (candidate.position && normalizeVietnamese(candidate.position).includes(normalizedSearchTerm))
+            );
+        }
+
+        filteredCandidates = candidates;
+        if (filteredCandidates.length === 0) {
+            showNotification('Không tìm thấy ứng viên phù hợp', 'info');
+        }
+        await displayCandidates(1, filteredCandidates);
+    } catch (error) {
+        showNotification(`Lỗi khi áp dụng bộ lọc/tìm kiếm: ${error.message}`, 'error');
+        console.error(error);
+    }
+}
+
+// Gắn sự kiện cho bộ lọc và tìm kiếm
+document.getElementById('applyFilters').addEventListener('click', applyFilters);
+document.getElementById('resetFilters').addEventListener('click', async () => {
+    document.getElementById('positionFilter').value = '';
+    document.querySelector('.search-bar').value = '';
+    filteredCandidates = null;
+    await displayCandidates(1);
+    await renderPositionFilter();
+});
+displayCandidates(1);
+renderPositionFilter();
+</script>
+</body>
+</html>

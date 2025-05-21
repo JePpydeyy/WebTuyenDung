@@ -1,0 +1,573 @@
+/* Biến CSS cho màu sắc và kích thước */
+:root {
+  --primary-color: #007bff;
+  --secondary-color: #100f27;
+  --text-color: #333;
+  --text-muted: #666;
+  --border-color: #ddd;
+  --background-light: #fff;
+  --background-gray: #f4f5f7;
+  --status-new-bg: #e3f2fd;
+  --status-new-text: #0d47a1;
+  --status-interview-bg: #fff8e1;
+  --status-interview-text: #ff6f00;
+  --status-hired-bg: #e8f5e9;
+  --status-hired-text: #1b5e20;
+  --status-rejected-bg: #ffebee;
+  --status-rejected-text: #b71c1c;
+  --spacing-sm: 8px;
+  --spacing-md: 15px;
+  --spacing-lg: 20px;
+  --border-radius: 5px;
+  --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Reset và kiểu chung */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background-gray);
+}
+
+/* Thanh bên */
+.sidebar {
+  width: 250px;
+  background: var(--secondary-color);
+  color: #fff;
+  padding: var(--spacing-lg);
+  position: fixed;
+  height: 100%;
+  will-change: transform;
+}
+
+.sidebar .logo {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sidebar .logo img {
+  width: 170px;
+  height: auto;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li {
+  margin: var(--spacing-lg) 0;
+}
+
+.sidebar ul li a {
+  color: #b0b7c3;
+  text-decoration: none;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.sidebar ul li a i {
+  margin-right: 10px;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a:focus {
+  color: #fff;
+  outline: none;
+}
+
+/* Nội dung chính */
+.main-content {
+  margin-left: 250px;
+  padding: var(--spacing-lg);
+  width: calc(100% - 250px);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.header .search-bar {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  width: 200px;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.header .search-bar:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* Bộ lọc */
+.filters {
+  background: var(--background-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.filters select,
+.filters input {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+}
+
+.filters select:focus,
+.filters input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.filters button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--secondary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.filters button:hover {
+  background: #1a1a3b;
+}
+
+/* Bảng hồ sơ ứng tuyển */
+.applications {
+  background: var(--background-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: var(--spacing-lg);
+}
+
+.applications h3 {
+  font-size: 1.125rem;
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.applications h3 button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.applications h3 button:hover {
+  background: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  background: #f8f9fa;
+  color: var(--text-muted);
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+}
+
+.status.moi {
+  background: var(--status-new-bg);
+  color: var(--status-new-text);
+}
+
+.status.phong-van {
+  background: var(--status-interview-bg);
+  color: var(--status-interview-text);
+}
+
+.status.duoc-nhan {
+  background: var(--status-hired-bg);
+  color: var(--status-hired-text);
+}
+
+.status.tu-choi {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.action-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: background-color 0.2s ease;
+}
+
+.action-buttons .view {
+  background: var(--status-new-bg);
+  color: var(--status-new-text);
+}
+
+.action-buttons .edit {
+  background: var(--status-interview-bg);
+  color: var(--status-interview-text);
+}
+
+.action-buttons .delete {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+.action-buttons button:hover {
+  opacity: 0.9;
+}
+
+/* Form thêm ứng viên */
+.add-candidate {
+  background: var(--background-light);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.add-candidate h3 {
+  font-size: 1.125rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: 0.875rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.form-group textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.form-actions button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.form-actions .cancel {
+  background: #f8f9fa;
+  color: var(--text-color);
+}
+
+.form-actions .submit {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.form-actions button:hover {
+  opacity: 0.9;
+}
+
+.file-upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-upload input {
+  flex: 1;
+}
+
+.file-upload button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--secondary-color);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.file-upload button:hover {
+  background: #1a1a3b;
+}
+
+/* Phân trang */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--spacing-lg);
+  gap: 5px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  background: var(--background-light);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pagination button.active,
+.pagination button:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+/* Modal */
+.modal {
+  display: block;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background: var(--background-light);
+  margin: 5% auto;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 1.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close:hover {
+  color: var(--text-color);
+}
+
+.candidate-details {
+  margin-top: var(--spacing-lg);
+}
+
+.detail-row {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.detail-group {
+  flex: 1;
+}
+
+.detail-group.full {
+  flex: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.detail-group label {
+  font-weight: bold;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 5px;
+}
+
+.detail-group p {
+  margin: 0;
+}
+
+.detail-action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--spacing-lg);
+  justify-content: c;
+}
+
+.status-btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.status-btn.moi {
+  background: var(--status-new-bg);
+  color: var(--status-new-text);
+}
+
+.status-btn.phong-van {
+  background: var(--status-interview-bg);
+  color: var(--status-interview-text);
+}
+
+.status-btn.duoc-nhan {
+  background: var(--status-hired-bg);
+  color: var(--status-hired-text);
+}
+
+.status-btn.tu-choi {
+  background: var(--status-rejected-bg);
+  color: var(--status-rejected-text);
+}
+
+.status-btn:hover {
+  opacity: 0.9;
+}
+
+/* Notification */
+.notification {
+  position: fixed;
+  top: var(--spacing-lg);
+  right: var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  color: #fff;
+  z-index: 1001;
+  animation: slideIn 0.3s ease;
+}
+
+.notification.success {
+  background: #28a745;
+}
+
+.notification.error {
+  background: #dc3545;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
+
+  .main-content {
+    margin-left: 200px;
+    width: calc(100% - 200px);
+  }
+
+  .header .search-bar {
+    width: 100%;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+  }
+
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
