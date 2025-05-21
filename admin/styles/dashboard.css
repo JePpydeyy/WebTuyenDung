@@ -1,0 +1,230 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: #f4f5f7;
+    }
+
+    /* Thanh bên */
+    .sidebar {
+      width: 250px;
+      background: #100f27;
+      color: #fff;
+      padding: 20px;
+      position: fixed;
+      height: 100%;
+    }
+
+    .sidebar .logo {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        width: 170px;
+        height: 100px;
+    }
+    .sidebar .logo img {
+      width: 100%;
+      height: auto;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      margin: 20px 0;
+    }
+
+    .sidebar ul li a {
+      color: #b0b7c3;
+      text-decoration: none;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar ul li a i {
+      margin-right: 10px;
+    }
+
+    .sidebar ul li a:hover {
+      color: #fff;
+    }
+
+    /* Nội dung chính */
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      width: calc(100% - 250px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #333;
+    }
+
+    .header .search-bar {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      width: 200px;
+    }
+
+    /* Thẻ chỉ số */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .card .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .card .change {
+      font-size: 12px;
+      margin-left: 10px;
+    }
+
+    .card .change.positive {
+      color: #28a745;
+    }
+
+    .card .change.negative {
+      color: #dc3545;
+    }
+
+    .card .chart-placeholder {
+      height: 60px;
+      background: #f8f9fa;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    /* Bảng đơn hàng gần đây */
+    .recent-orders {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .recent-orders h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f8f9fa;
+      color: #666;
+    }
+
+    td img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .status {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+
+    .status.dang-van-chuyen {
+      background: #ffd700;
+      color: #333;
+    }
+
+    .status.da-giao {
+      background: #28a745;
+      color: #fff;
+    }
+
+    /* Lượng khách hàng */
+    .customer-acquisition {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .customer-acquisition h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .customer-acquisition .chart-placeholder {
+      height: 150px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+
+    .legend {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 10px;
+    }
+
+    .legend div {
+      display: flex;
+      align-items: center;
+      margin-left: 15px;
+      font-size: 12px;
+    }
+
+    .legend div span {
+      width: 10px;
+      height: 10px;
+      display: inline-block;
+      margin-right: 5px;
+      border-radius: 50%;
+    }
+
+    .legend .returning span {
+      background: #007bff;
+    }
+
+    .legend .first-time span {
+      background: #ff6f61;
+    }
