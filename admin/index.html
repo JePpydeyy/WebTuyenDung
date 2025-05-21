@@ -11,11 +11,11 @@
 <body>
   <!-- Thanh bên -->
   <div class="sidebar">
-    <div class="logo">
+    <a href="index.html" class="logo">
         <img src="../images/logo.png" alt="Logo">
-    </div>
+    </a>
     <ul>
-      <li><a href="#"><i class="fa-solid fa-chart-line"></i> Bảng Điều Khiển</a></li>
+      <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Bảng Điều Khiển</a></li>
       <li><a href="#"><i class="fa-regular fa-newspaper"></i> Tin Tức</a></li>
       <li><a href="#"><i class="fa-solid fa-address-card"></i> Hồ Sơ Ứng Tuyển</a></li>
       <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất</a></li>
@@ -25,114 +25,87 @@
   <!-- Nội dung chính -->
   <div class="main-content">
     <div class="header">
-      <h1>Bảng Điều Khiển Thương Mại Điện Tử</h1>
-      <input type="text" class="search-bar" placeholder="Tìm kiếm...">
+      <h1>Bảng Điều Khiển </h1>
+      <div class="search-bar-container">
+       <input type="text" class="search-bar" placeholder="Tìm kiếm...">
+      <div class="user">
+        <img src="../images/userAdmin.png" alt="user">
+      </div>
+
+      </div>
+      
     </div>
 
     <!-- Thẻ chỉ số -->
     <div class="metrics">
       <div class="card">
-        <h3>Tổng Doanh Thu</h3>
-        <div class="value">$12099 <span class="change positive">↑ 5.86%</span></div>
-        <div class="chart-placeholder"></div>
+        <h3>Tổng bài đăng tin tức</h3>
+        <div class="value">20</div>
       </div>
       <div class="card">
-        <h3>Doanh Thu Liên Kết</h3>
-        <div class="value">$12099 <span class="change positive">↑ 5.86%</span></div>
-        <div class="chart-placeholder"></div>
+        <h3>Tổng hồ sơ ứng tuyển</h3>
+        <div class="value">12</div>
       </div>
       <div class="card">
-        <h3>Hoàn Tiền</h3>
-        <div class="value">0.00</div>
-        <div class="chart-placeholder"></div>
-      </div>
-      <div class="card">
-        <h3>Doanh Thu Trung Bình/Người Dùng</h3>
-        <div class="value">$28000 <span class="change negative">↓ 2.00%</span></div>
-        <div class="chart-placeholder"></div>
+        <h3>Tổng hồ sơ tiếp nhận</h3>
+        <div class="value">10</div>
       </div>
     </div>
 
     <!-- Đơn hàng gần đây -->
     <div class="recent-orders">
-      <h3>Đơn Hàng Gần Đây</h3>
+      <h3>Hồ sơ ứng tuyển gần đây</h3>
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Hình Ảnh</th>
-            <th>Tên Sản Phẩm</th>
-            <th>Mã Sản Phẩm</th>
-            <th>Số Lượng</th>
-            <th>Giá</th>
-            <th>Thời Gian Đặt</th>
-            <th>Khách Hàng</th>
+            <th>ID</th>
+            <th>Họ Và Tên</th>
+            <th>Email</th>
+            <th>Số Điện Thoại</th>
+            <th>Vị Trí Ứng Tuyển</th>
+            <th>Ngày Nộp</th>
             <th>Trạng Thái</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>1</td>
-            <td><img src="https://via.placeholder.com/40" alt="Sản phẩm"></td>
-            <td>Sản phẩm #1</td>
-            <td>id00001</td>
-            <td>20</td>
-            <td>$80.00</td>
-            <td>27-08-2018 12:12</td>
-            <td>Patricia J. King</td>
-            <td><span class="status dang-van-chuyen">Đang Vận Chuyển</span></td>
+            <td>Đinh Thế Nhân</td>
+            <td>nhandtps40210@gmail.com</td>
+            <td>0342031354</td>
+            <td>Senior Training Executive</td>
+            <td>27-08-2024 12:12</td>
+            <td><span class="status dangchoxetduyet">Đang chờ xét duyệt</span></td>
           </tr>
-          <tr>
-            <td>2</td>
-            <td><img src="https://via.placeholder.com/40" alt="Sản phẩm"></td>
-            <td>Sản phẩm #2</td>
-            <td>id00002</td>
-            <td>12</td>
-            <td>$180.00</td>
-            <td>25-08-2018 12:56</td>
-            <td>Rachel J. Wicker</td>
-            <td><span class="status da-giao">Đã Giao</span></td>
+          <td>2</td>
+            <td>Đinh Thế Nhân</td>
+            <td>nhandtps40210@gmail.com</td>
+            <td>0342031354</td>
+            <td>Customer Service Executive</td>
+            <td>27-08-2024 12:12</td>
+            <td><span class="status daduyet">Đã duyệt</span></td>
           </tr>
-          <tr>
-            <td>3</td>
-            <td><img src="https://via.placeholder.com/40" alt="Sản phẩm"></td>
-            <td>Sản phẩm #5</td>
-            <td>id00003</td>
-            <td>23</td>
-            <td>$820.00</td>
-            <td>24-08-2018 14:27</td>
-            <td>Michael K. Ledford</td>
-            <td><span class="status da-giao">Đã Giao</span></td>
+          <td>3</td>
+            <td>Đinh Thế Nhân</td>
+            <td>nhandtps40210@gmail.com</td>
+            <td>0342031354</td>
+            <td>Content Marketing Intern</td>
+            <td>27-08-2024 12:12</td>
+            <td><span class="status daduyet">Đã duyệt</span></td>
           </tr>
-          <tr>
-            <td>4</td>
-            <td><img src="https://via.placeholder.com/40" alt="Sản phẩm"></td>
-            <td>Sản phẩm #4</td>
-            <td>id00004</td>
-            <td>34</td>
-            <td>$340.00</td>
-            <td>22-08-2018 09:35</td>
-            <td>Michael K. Ledford</td>
-            <td><span class="status da-giao">Đã Giao</span></td>
+          <td>4</td>
+            <td>Đinh Thế Nhân</td>
+            <td>nhandtps40210@gmail.com</td>
+            <td>0342031354</td>
+            <td>Operations Manager (E-commerce)</td>
+            <td>27-08-2024 12:12</td>
+            <td><span class="status dangchoxetduyet">Đang chờ xét duyệt</span></td>
           </tr>
+          
         </tbody>
       </table>
     </div>
 
-    <!-- Lượng khách hàng -->
-    <div class="customer-acquisition">
-      <h3>Lượng Khách Hàng</h3>
-      <div class="chart-placeholder"></div>
-      <div class="legend">
-        <div class="returning"><span></span> Khách Quay Lại</div>
-        <div class="first-time"><span></span> Khách Mới</div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // JavaScript có thể được thêm vào để xử lý các tương tác, ví dụ: tìm kiếm, lọc bảng, v.v.
-    console.log("Trang quản trị đã được tải.");
-  </script>
+  
 </body>
 </html>
