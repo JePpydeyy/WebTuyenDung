@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Công Việc</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css" />
+  <style>
+    /* Biến CSS cho màu sắc và kích thước */
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #100f27;
+      --text-color: #333;
+      --text-muted: #666;
+      --border-color: #ddd;
+      --background-light: #fff;
+      --background-gray: #f4f5f7;
+      --status-new-bg: #e3f2fd;
+      --status-new-text: #0d47a1;
+      --status-interview-bg: #fff8e1;
+      --status-interview-text: #ff6f00;
+      --status-hired-bg: #e8f5e9;
+      --status-hired-text: #1b5e20;
+      --status-rejected-bg: #ffebee;
+      --status-rejected-text: #b71c1c;
+      --spacing-sm: 8px;
+      --spacing-md: 15px;
+      --spacing-lg: 20px;
+      --border-radius: 5px;
+      --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Reset và kiểu chung */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background: var(--background-gray);
+    }
+
+    /* Thanh bên */
+    .sidebar {
+      width: 250px;
+      background: var(--secondary-color);
+      color: #fff;
+      padding: var(--spacing-lg);
+      position: fixed;
+      height: 100%;
+      will-change: transform;
+    }
+
+    .sidebar .logo {
+      display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      margin: var(--spacing-lg) 0;
+    }
+
+    .sidebar ul li a {
+      color: #b0b7c3;
+      text-decoration: none;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s ease;
+    }
+
+    .sidebar ul li a.active {
+      color: #fff;
+    }
+
+    .sidebar ul li a i {
+      margin-right: 10px;
+    }
+
+    .sidebar .logo img {
+  width: 170px;
+  height: auto;
+}
+
+    .sidebar ul li a:hover,
+    .sidebar ul li a:focus {
+      color: #fff;
+      outline: none;
+    }
+
+    /* Nội dung chính */
+    .main-content {
+      margin-left: 250px;
+      padding: var(--spacing-lg);
+      width: calc(100% - 250px);
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      color: var(--text-color);
+    }
+
+    /* Bộ lọc */
+    .filters {
+      background: var(--background-light);
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: var(--spacing-lg);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-md);
+    }
+
+    .filters select,
+    .filters input {
+      padding: var(--spacing-sm);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+    }
+
+    .filters select:focus,
+    .filters input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    .filters button {
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: var(--secondary-color);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .filters button:hover {
+      background: #1a1a3b;
+    }
+
+    /* Bảng công việc */
+    .jobs {
+      background: var(--background-light);
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .jobs h3 {
+      font-size: 1.125rem;
+      margin-bottom: var(--spacing-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .jobs h3 button {
+      padding: var(--spacing-sm) var(--spacing-md);
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .jobs h3 button:hover {
+      background: #0056b3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      font-size: 0.875rem;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f8f9fa;
+      color: var(--text-muted);
+    }
+
+    .status {
+      padding: 5px 10px;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+    }
+
+    .status.active {
+      background: var(--status-hired-bg);
+      color: var(--status-hired-text);
+    }
+
+    .status.inactive {
+      background: var(--status-rejected-bg);
+      color: var(--status-rejected-text);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+    }
+
+    .action-buttons button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .action-buttons .view {
+      background: var(--status-new-bg);
+      color: var(--status-new-text);
+    }
+
+    .action-buttons .edit {
+      background: var(--status-interview-bg);
+      color: var(--status-interview-text);
+    }
+
+    .action-buttons .delete {
+      background: var(--status-rejected-bg);
+      color: var(--status-rejected-text);
+    }
+
+    .action-buttons button:hover {
+      opacity: 0.9;
+    }
+
+    /* Form thêm công việc */
+    .add-job {
+      background: var(--background-light);
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      display: none;
+    }
+
+    .add-job.show {
+      display: block;
+    }
+
+    .add-job h3 {
+      font-size: 1.125rem;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: var(--spacing-sm);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 0.875rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    .form-group textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-actions button {
+      padding: var(--spacing-sm) var(--spacing-md);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .form-actions .cancel {
+      background: #f8f9fa;
+      color: var(--text-color);
+    }
+
+    .form-actions .submit {
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .form-actions button:hover {
+      opacity: 0.9;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal.show {
+      display: block;
+    }
+
+    .modal-content {
+      background: var(--background-light);
+      margin: 5% auto;
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius);
+      width: 80%;
+      max-width: 800px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 1.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .close:hover {
+      color: var(--text-color);
+    }
+
+    .job-details {
+      margin-top: var(--spacing-lg);
+    }
+
+    .detail-row {
+      display: flex;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .detail-group {
+      flex: 1;
+    }
+
+    .detail-group.full {
+      flex: 100%;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .detail-group label {
+      font-weight: bold;
+      color: var(--text-muted);
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .detail-group p {
+      margin: 0;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: var(--spacing-lg);
+      right: var(--spacing-lg);
+      padding: var(--spacing-sm) var(--spacing-md);
+      border-radius: var(--border-radius);
+      color: #fff;
+      z-index: 1001;
+      animation: slideIn 0.3s ease;
+    }
+
+    .notification.success {
+      background: #28a745;
+    }
+
+    .notification.error {
+      background: #dc3545;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+      }
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 200px;
+      }
+
+      .main-content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Thanh bên -->
+  <div class="sidebar">
+    <div class="logo">
+    <img src="../images/logo.png" alt="Logo">
+    </div>
+    <ul>
+      <li><a href="#"><i class="fa-solid fa-chart-line"></i> Bảng Điều Khiển</a></li>
+      <li><a href="#"><i class="fa-regular fa-newspaper"></i> Tin Tức</a></li>
+      <li><a href="./Job.html" class="active"><i class="fa-solid fa-briefcase"></i> Quản Lý Công Việc</a></li>
+      <li><a href="./SubmitProfile.html"><i class="fa-solid fa-address-card"></i> Hồ Sơ Ứng Tuyển</a></li>
+      <li><a href="#"><i class="fa-solid fa-right-from-bracket"></i> Đăng Xuất</a></li>
+    </ul>
+  </div>
+
+  <!-- Nội dung chính -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Quản Lý Công Việc Ứng Tuyển</h1>
+    </div>
+
+    <!-- Bộ lọc -->
+    <div class="filters">
+      <input type="text" class="search-bar" placeholder="Tìm kiếm công việc...">
+      <select id="statusFilter">
+        <option value="">- Tất cả trạng thái -</option>
+        <option value="Đang tuyển">Đang tuyển</option>
+        <option value="Tạm dừng">Tạm dừng</option>
+      </select>
+      <select id="levelFilter">
+        <option value="">- Tất cả cấp bậc -</option>
+        <option value="Nhân viên">Nhân viên</option>
+        <option value="Trưởng nhóm">Trưởng nhóm</option>
+        <option value="Quản lý">Quản lý</option>
+        <option value="Giám đốc">Giám đốc</option>
+      </select>
+      <button id="applyFilters"><i class="fa-solid fa-filter"></i> Áp dụng</button>
+      <button id="resetFilters"><i class="fa-solid fa-rotate"></i> Đặt lại</button>
+    </div>
+
+    <!-- Danh sách công việc -->
+    <div class="jobs">
+      <h3>Danh Sách Công Việc
+        <button id="addJobBtn"><i class="fa-solid fa-plus"></i> Thêm Công Việc</button>
+      </h3>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên Công Việc</th>
+            <th>Thương Hiệu</th>
+            <th>Cấp Bậc</th>
+            <th>Mức Lương</th>
+            <th>Địa Điểm</th>
+            <th>Hạn Nộp</th>
+            <th>Trạng Thái</th>
+            <th>Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="jobsTableBody">
+          <!-- Dữ liệu sẽ được thêm bằng JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Form thêm công việc -->
+    <div class="add-job" id="addJobForm">
+      <h3>Thêm Công Việc Mới</h3>
+      <form id="jobForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="jobTitle">Tên Công Việc *</label>
+            <input type="text" id="jobTitle" name="title" required>
+          </div>
+          <div class="form-group">
+            <label for="jobBrand">Thương Hiệu *</label>
+            <select id="jobBrand" name="brand" required>
+              <option value="">Chọn thương hiệu</option>
+              <option value="ACFC">ACFC</option>
+              <option value="Nike">Nike</option>
+              <option value="Tommy">Tommy</option>
+              <option value="Mango">Mango</option>
+              <option value="Levi's">Levi's</option>
+              <option value="Cotton On">Cotton On</option>
+              <option value="Old Navy">Old Navy</option>
+              <option value="MotherCare">MotherCare</option>
+              <option value="CK">CK</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="jobLevel">Cấp Bậc *</label>
+            <select id="jobLevel" name="level" required>
+              <option value="">Chọn cấp bậc</option>
+              <option value="Nhân viên">Nhân viên</option>
+              <option value="Trưởng nhóm">Trưởng nhóm</option>
+              <option value="Quản lý">Quản lý</option>
+              <option value="Giám đốc">Giám đốc</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="jobSalary">Mức Lương</label>
+            <input type="text" id="jobSalary" name="salary" placeholder="VD: 15-20 triệu VND">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="jobLocation">Địa Điểm *</label>
+            <input type="text" id="jobLocation" name="location" required placeholder="VD: Thành Phố Hồ Chí Minh">
+          </div>
+          <div class="form-group">
+            <label for="jobDeadline">Hạn Nộp Hồ Sơ *</label>
+            <input type="date" id="jobDeadline" name="deadline" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="jobDescription">Mô Tả Công Việc *</label>
+          <textarea id="jobDescription" name="description" required placeholder="Mô tả chi tiết về công việc..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="jobRequirements">Yêu Cầu Công Việc *</label>
+          <textarea id="jobRequirements" name="requirements" required placeholder="Các yêu cầu cần thiết cho ứng viên..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="jobBenefits">Quyền Lợi</label>
+          <textarea id="jobBenefits" name="benefits" placeholder="Các quyền lợi được hưởng..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="cancel" id="cancelJobBtn">Hủy</button>
+          <button type="submit" class="submit">Thêm Công Việc</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal xem chi tiết -->
+  <div id="jobDetailModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <div id="jobDetailContent">
+        <!-- Nội dung chi tiết sẽ được thêm bằng JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Dữ liệu mẫu
+    let jobs = [
+      {
+        id: 'JOB001',
+        title: 'Customer Service Executive',
+        brand: 'ACFC',
+        level: 'Nhân viên',
+        salary: 'Negotiation',
+        location: 'Thành Phố Hồ Chí Minh',
+        deadline: '26/05/2025',
+        status: 'Đang tuyển',
+        description: `Chịu trách nhiệm tư vấn giải đáp thông tin thông qua điện thoại và các trang mạng xã hội của các thương hiệu của công ty ACFC (Nike, Tommy, Mango, Levi's, Cotton On, Old Navy, MotherCare, CK,...)
+        
+Tiếp nhận, trả lời và xử lý các yêu cầu của khách hàng (các vấn đề trong phạm vi chuyên môn, nghiệp vụ) qua điện thoại.
+
+Chuyển thông tin nhận được cho những bộ phận có trách nhiệm giải quyết đúng thời theo dõi kết quả của quá trình đó cho đến khi hoàn tất.
+
+Cập nhật chính sách ưu đãi, khuyến mại và kinh doanh của cửa hàng để có thể hướng dẫn và cung cấp thông tin cần thiết cho khách hàng (qua điện thoại/email,…hoặc trực tiếp).
+
+Nắm bắt các yêu cầu của khách hàng, tìm hiểu những mong muốn của khách hàng đối với dịch vụ tại cửa hàng và báo cáo lên cấp quản lý.
+
+Trực tiếp cập nhật các thông tin dữ liệu khách hàng vào hệ thống theo quy định của Công ty.`,
+        requirements: `Trình độ: Tốt nghiệp trung học phổ thông trở lên
+Ưu tiên kinh nghiệm trong lĩnh vực chăm sóc khách hàng
+Giọng nói dễ nghe
+Có thể giao tiếp Tiếng Anh là một lợi thế`,
+        benefits: `Lộ trình thăng tiến rõ ràng
+Môi trường làm việc chuyên nghiệp
+Phụ cấp cơm 520k/tháng
+Chế độ bảo hiểm
+Du lịch
+Đào tạo
+Nghỉ phép năm`
+      },
+      {
+        id: 'JOB002',
+        title: 'Sales Manager',
+        brand: 'Nike',
+        level: 'Quản lý',
+        salary: '25-30 triệu VND',
+        location: 'Hà Nội',
+        deadline: '30/05/2025',
+        status: 'Đang tuyển',
+        description: 'Quản lý đội ngũ bán hàng, phát triển chiến lược kinh doanh...',
+        requirements: 'Có kinh nghiệm quản lý ít nhất 3 năm...',
+        benefits: 'Lương cạnh tranh, thưởng hiệu suất...'
+      }
+    ];
+
+    let nextJobId = 3;
+
+    // Hiển thị thông báo
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    }
+
+    // Hiển thị danh sách công việc
+    function displayJobs(jobsToShow = jobs) {
+      const tbody = document.getElementById('jobsTableBody');
+      tbody.innerHTML = '';
+
+      if (jobsToShow.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Không tìm thấy công việc nào</td></tr>';
+        return;
+      }
+
+      jobsToShow.forEach(job => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${job.id}</td>
+          <td>${job.title}</td>
+          <td>${job.brand}</td>
+          <td>${job.level}</td>
+          <td>${job.salary}</td>
+          <td>${job.location}</td>
+          <td>${job.deadline}</td>
+          <td><span class="status ${job.status === 'Đang tuyển' ? 'active' : 'inactive'}">${job.status}</span></td>
+          <td>
+            <div class="action-buttons">
+              <button class="view" onclick="viewJob('${job.id}')"><i class="fa-solid fa-eye"></i></button>
+              <button class="edit" onclick="editJob('${job.id}')"><i class="fa-solid fa-edit"></i></button>
+              <button class="delete" onclick="deleteJob('${job.id}')"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Xem chi tiết công việc
+    function viewJob(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      const modal = document.getElementById('jobDetailModal');
+      const content = document.getElementById('jobDetailContent');
+      
+      content.innerHTML = `
+        <h3>Chi Tiết Công Việc: ${job.title}</h3>
+        <div class="job-details">
+          <div class="detail-row">
+            <div class="detail-group">
+              <label>ID:</label>
+              <p>${job.id}</p>
+            </div>
+            <div class="detail-group">
+              <label>Trạng thái:</label>
+              <p><span class="status ${job.status === 'Đang tuyển' ? 'active' : 'inactive'}">${job.status}</span></p>
+            </div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-group">
+              <label>Tên công việc:</label>
+              <p>${job.title}</p>
+            </div>
+            <div class="detail-group">
+              <label>Thương hiệu:</label>
+              <p>${job.brand}</p>
+            </div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-group">
+              <label>Cấp bậc:</label>
+              <p>${job.level}</p>
+            </div>
+            <div class="detail-group">
+              <label>Mức lương:</label>
+              <p>${job.salary}</p>
+            </div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-group">
+              <label>Địa điểm:</label>
+              <p>${job.location}</p>
+            </div>
+            <div class="detail-group">
+              <label>Hạn nộp:</label>
+              <p>${job.deadline}</p>
+            </div>
+          </div>
+          <div class="detail-group full">
+            <label>Mô tả công việc:</label>
+            <p style="white-space: pre-line;">${job.description}</p>
+          </div>
+          <div class="detail-group full">
+            <label>Yêu cầu công việc:</label>
+            <p style="white-space: pre-line;">${job.requirements}</p>
+          </div>
+          <div class="detail-group full">
+            <label>Quyền lợi:</label>
+            <p style="white-space: pre-line;">${job.benefits}</p>
+          </div>
+        </div>
+      `;
+      
+      modal.classList.add('show');
+    }
+
+    // Sửa công việc
+    function editJob(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      // Hiển thị form và điền dữ liệu
+      document.getElementById('addJobForm').classList.add('show');
+      document.getElementById('jobTitle').value = job.title;
+      document.getElementById('jobBrand').value = job.brand;
+      document.getElementById('jobLevel').value = job.level;
+      document.getElementById('jobSalary').value = job.salary;
+      document.getElementById('jobLocation').value = job.location;
+ // ...existing code...
+      document.getElementById('jobDeadline').value = formatDateForInput(job.deadline);
+      document.getElementById('jobDescription').value = job.description;
+      document.getElementById('jobRequirements').value = job.requirements;
+      document.getElementById('jobBenefits').value = job.benefits || '';
+      // Đánh dấu là đang sửa
+      document.getElementById('jobForm').setAttribute('data-edit-id', job.id);
+      document.querySelector('.add-job .submit').textContent = 'Cập Nhật Công Việc';
+    }
+
+    // Xóa công việc
+    function deleteJob(jobId) {
+      if (confirm('Bạn có chắc chắn muốn xóa công việc này?')) {
+        jobs = jobs.filter(j => j.id !== jobId);
+        displayJobs();
+        showNotification('Đã xóa công việc!', 'success');
+      }
+    }
+
+    // Đóng modal chi tiết
+    document.getElementById('closeModal').onclick = function() {
+      document.getElementById('jobDetailModal').classList.remove('show');
+    };
+    window.onclick = function(event) {
+      const modal = document.getElementById('jobDetailModal');
+      if (event.target === modal) modal.classList.remove('show');
+    };
+
+    // Hiển thị form thêm công việc
+    document.getElementById('addJobBtn').onclick = function() {
+      document.getElementById('addJobForm').classList.add('show');
+      document.getElementById('jobForm').reset();
+      document.getElementById('jobForm').removeAttribute('data-edit-id');
+      document.querySelector('.add-job .submit').textContent = 'Thêm Công Việc';
+    };
+    document.getElementById('cancelJobBtn').onclick = function() {
+      document.getElementById('addJobForm').classList.remove('show');
+      document.getElementById('jobForm').reset();
+      document.getElementById('jobForm').removeAttribute('data-edit-id');
+    };
+
+    // Thêm hoặc cập nhật công việc
+    document.getElementById('jobForm').onsubmit = function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const job = {
+        id: form.getAttribute('data-edit-id') || generateJobId(),
+        title: form.jobTitle.value,
+        brand: form.jobBrand.value,
+        level: form.jobLevel.value,
+        salary: form.jobSalary.value,
+        location: form.jobLocation.value,
+        deadline: formatDateDisplay(form.jobDeadline.value),
+        status: 'Đang tuyển',
+        description: form.jobDescription.value,
+        requirements: form.jobRequirements.value,
+        benefits: form.jobBenefits.value
+      };
+      if (form.getAttribute('data-edit-id')) {
+        // Cập nhật
+        const idx = jobs.findIndex(j => j.id === job.id);
+        if (idx !== -1) jobs[idx] = job;
+        showNotification('Đã cập nhật công việc!', 'success');
+      } else {
+        // Thêm mới
+        jobs.push(job);
+        showNotification('Đã thêm công việc mới!', 'success');
+      }
+      displayJobs();
+      document.getElementById('addJobForm').classList.remove('show');
+      form.reset();
+      form.removeAttribute('data-edit-id');
+    };
+
+    // Tìm kiếm và lọc
+    document.getElementById('applyFilters').onclick = function() {
+      const search = document.querySelector('.search-bar').value.trim().toLowerCase();
+      const status = document.getElementById('statusFilter').value;
+      const level = document.getElementById('levelFilter').value;
+      let filtered = jobs;
+      if (search) {
+        filtered = filtered.filter(j =>
+          j.title.toLowerCase().includes(search) ||
+          j.brand.toLowerCase().includes(search) ||
+          j.location.toLowerCase().includes(search)
+        );
+      }
+      if (status) filtered = filtered.filter(j => j.status === status);
+      if (level) filtered = filtered.filter(j => j.level === level);
+      displayJobs(filtered);
+    };
+    document.getElementById('resetFilters').onclick = function() {
+      document.querySelector('.search-bar').value = '';
+      document.getElementById('statusFilter').value = '';
+      document.getElementById('levelFilter').value = '';
+      displayJobs();
+    };
+
+    // Tìm kiếm realtime
+    document.querySelector('.search-bar').addEventListener('input', function() {
+      document.getElementById('applyFilters').click();
+    });
+
+    // Helper: sinh ID công việc mới
+    function generateJobId() {
+      return 'JOB' + String(nextJobId++).padStart(3, '0');
+    }
+    // Helper: chuyển ngày yyyy-mm-dd sang dd/mm/yyyy
+    function formatDateDisplay(dateStr) {
+      if (!dateStr) return '';
+      const [y, m, d] = dateStr.split('-');
+      return `${d}/${m}/${y}`;
+    }
+    // Helper: chuyển ngày dd/mm/yyyy sang yyyy-mm-dd cho input date
+    function formatDateForInput(dateStr) {
+      if (!dateStr) return '';
+      const parts = dateStr.split('/');
+      if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      return dateStr;
+    }
+
+    // Khởi tạo trang
+    displayJobs();
+  </script>
+</body>
+</html>     

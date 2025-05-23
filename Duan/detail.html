@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Article</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .main-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-top: 20px;
+        }
+
+        /* Article Detail Styles */
+        .article-detail {
+            background: white;
+        }
+
+        .article-header {
+            background: white;
+            margin-bottom: 30px;
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .article-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .publish-date {
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .article-content {
+            background: white;
+        }
+
+        .content-block {
+            margin-bottom: 40px;
+        }
+
+        .content-text {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            text-align: justify;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .article-image {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .article-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+
+        .image-caption {
+            font-style: italic;
+            text-align: center;
+            font-size: 1rem;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 15px 30px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            color: #000;
+        }
+
+        .share-section {
+            background: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .share-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.8rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .share-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .share-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .facebook { background: linear-gradient(135deg, #3b5998, #2d4373); }
+        .twitter { background: linear-gradient(135deg, #1da1f2, #0d8bd9); }
+        .linkedin { background: linear-gradient(135deg, #0077b5, #005885); }
+        .email { background: linear-gradient(135deg, #34495e, #2c3e50); }
+        .pinterest { background: linear-gradient(135deg, #bd081c, #8b0513); }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #1678f2;
+        }
+
+        .news-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .grid-item {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .grid-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .grid-item.hidden {
+            display: none;
+        }
+
+        .grid-image {
+            height: 12rem;
+            overflow: hidden;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .grid-image img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .grid-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .grid-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #1678f2;
+            text-decoration: none;
+        }
+
+        .grid-title:hover {
+            text-decoration: none;
+            color: #a00;
+        }
+
+        .grid-date {
+            font-size: 0.875rem;
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+
+        .grid-excerpt {
+            font-size: 1rem;
+            font-weight: 200;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .article-title h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content-text {
+                font-size: 1rem;
+            }
+            
+            .share-buttons {
+                gap: 15px;
+            }
+            
+            .share-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+            
+            .grid-image {
+                height: 10rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            Đang tải bài viết...
+        </div>
+        
+        <div id="main-content" class="main-layout" style="display: none;">
+            <!-- Article Detail Section -->
+            <div class="article-detail">
+                <div class="article-header fade-in">
+                    <img id="thumbnail" class="thumbnail" alt="">
+                    <div class="article-title">
+                        <h1 id="article-title"></h1>
+                        <div class="publish-date" id="publish-date"></div>
+                    </div>
+                </div>
+
+                <div class="article-content fade-in">
+                    <div id="article-body"></div>
+                </div>
+
+                <a href="#" class="back-button" onclick="goBack()">← Quay lại</a>
+                
+                <div class="share-section fade-in">
+                    <h3 class="share-title">Chia sẻ bài viết</h3>
+                    <div class="share-buttons">
+                        <a href="#" class="share-btn facebook" onclick="shareOnFacebook()" title="Facebook">📘</a>
+                        <a href="#" class="share-btn twitter" onclick="shareOnTwitter()" title="Twitter">🐦</a>
+                        <a href="#" class="share-btn linkedin" onclick="shareOnLinkedIn()" title="LinkedIn">💼</a>
+                        <a href="#" class="share-btn email" onclick="shareViaEmail()" title="Email">✉️</a>
+                        <a href="#" class="share-btn pinterest" onclick="shareOnPinterest()" title="Pinterest">📌</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar with Other News -->
+            <div class="sidebar">
+                <h2 class="sidebar-title">Tin tức khác</h2>
+                <div class="news-grid" id="other-news">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample other news data
+        const otherNewsData = [
+            {
+                "id": "acfc-ho-tro-sinh-vien-khoi-nghiep",
+                "title": "ACFC HỖ TRỢ SINH VIÊN KHỞI NGHIỆP",
+                "image": "image/tintuc10.jpg",
+                "date": "05/04/2024",
+                "excerpt": "ACFC tổ chức chương trình hỗ trợ sinh viên khởi nghiệp, cung cấp cơ hội học hỏi và phát triển kỹ năng trong ngành thời trang."
+            },
+            {
+                "id": "fashion-show-2024",
+                "title": "FASHION SHOW 2024 - SÀN DIỄN THỜI TRANG",
+                "image": "image/tintuc2.jpg",
+                "date": "28/03/2024",
+                "excerpt": "Sự kiện thời trang lớn nhất năm với sự tham gia của các nhà thiết kế hàng đầu và những xu hướng thời trang mới nhất."
+            },
+            {
+                "id": "workshop-thiet-ke-ao",
+                "title": "WORKSHOP THIẾT KẾ ÁO SÁNG TẠO",
+                "image": "image/tintuc3.jpg",
+                "date": "15/03/2024",
+                "excerpt": "Khóa học thiết kế áo cho các bạn yêu thích thời trang, từ cơ bản đến nâng cao với sự hướng dẫn của các chuyên gia."
+            },
+            {
+                "id": "xu-huong-thoi-trang-mua-he",
+                "title": "XU HƯỚNG THỜI TRANG MÙA HÈ 2024",
+                "image": "image/tintuc4.jpg",
+                "date": "01/03/2024",
+                "excerpt": "Khám phá những xu hướng thời trang hot nhất mùa hè 2024 với màu sắc tươi sáng và phong cách trẻ trung."
+            },
+            {
+                "id": "cuoc-thi-thiet-ke-thoi-trang",
+                "title": "CUỘC THI THIẾT KẾ THỜI TRANG SINH VIÊN",
+                "image": "image/tintuc5.jpg",
+                "date": "20/02/2024",
+                "excerpt": "Cuộc thi dành cho sinh viên với nhiều giải thưởng hấp dẫn và cơ hội thể hiện tài năng thiết kế thời trang."
+            }
+        ];
+
+        // Article data with interleaved content and images
+        const articleData = {
+            "id": "fashion-day-inside-wow-2024",
+            "title": "HAPPY HOUR - FASHION DAY: INSIDE WOW! THAM GIA WORKSHOP DRAW YOUR TEE & LỄ TRAO GIẢI STYLE UP WITH ACFC",
+            "slug": "happy-hour-fashion-day-inside-wow-workshop-draw-your-tee-style-up-acfc",
+            "thumbnailUrl": "image/tintuc1.jpg",
+            "thumbnailCaption": "Fashion Day Inside WOW - Sự kiện thời trang đặc biệt của ACFC & VFBS",
+            "publishedAt": "2024-08-09T00:00:00.000Z",
+            "contentBlocks": [
+                {
+                    "type": "text",
+                    "content": "Tuần vừa qua, đại gia đình ACFC & VFBS đã cùng nhau tạo nên một Happy Hour - Fashion Day với chủ đề INSIDE WOW, chương trình đã thu hút đông đảo tín đồ thời trang nhà ACFC & VFBS nhiệt tình tham gia, để lại thật nhiều ấn tượng và cảm xúc!"
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.2.jpg",
+                    "caption": "Không khí sôi động tại Fashion Day Inside WOW"
+                },
+                {
+                    "type": "text",
+                    "content": "Khởi động sự kiện với Fashion Workshop Draw Your Tee, các tài năng của nhà ACFC và VFBS được chia theo đội dưới sự hướng dẫn của Artist, Tailor Master Kiệt Quách. Từ những ý tưởng sáng tạo, mỗi đội đã tự tay custom những chiếc áo trắng đơn giản của GAP thành những tác phẩm nghệ thuật độc đáo, xứng danh là những fashion-lovers. Qua hoạt động này, không chỉ tài năng hội họa mà còn thể hiện tinh thần đồng đội mạnh mẽ của các thành viên."
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.3.png",
+                    "caption": "Workshop Draw Your Tee - Các thành viên sáng tạo những thiết kế độc đáo"
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.4.png",
+                    "caption": "Master Kiệt Quách hướng dẫn các thành viên trong workshop"
+                },
+                {
+                    "type": "text",
+                    "content": "Tinh thần bùng nổ của FASHION WORKSHOP: DRAW YOUR TEE được tiếp tục với lễ vinh danh và trao thưởng cho các đại diện thắng cuộc trao giải Fashion Contest: Style Up With ACFC tại FASHION DAY: INSIDE WOW."
+                },
+                {
+                    "type": "text",
+                    "content": "Hơn 200 bài thi đã làm \"dậy sóng\" giới yêu thời trang ACFC & VFBS suốt một tháng qua! Từ những outfit mang đậm phong cách cá nhân cho đến những màn mix&match thời thượng, các thí sinh đã thật sự khiến cả khán phòng phải \"WOW\" liên tục với màn trình diễn catwalk và pose dáng cực slay ngay tại sân khấu."
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.5.png",
+                    "caption": "Những màn trình diễn catwalk ấn tượng khiến khán giả liên tục \"WOW\""
+                },
+                {
+                    "type": "text",
+                    "content": "Đặc biệt, các hạng mục giải thưởng đã gọi tên những \"ngôi sao\", những đội chơi xuất sắc nhất ở từng hạng mục. Chương trình cũng là lời kết trọn vẹn cho Fashion Month đã diễn ra từ cuối tháng sáu."
+                },
+                {
+                    "type": "text",
+                    "content": "Style Up With ACFC chân thành cảm ơn sự tài trợ của các brand Calvin Klein, Levi's, Owndays, Sunnies Face, Sunnies Studios, Swarovski, Tommy Hilfiger, TYPO, United Colors Of Benetton và GAP đã đồng hành cùng Fashion Month trong suốt một tháng vừa qua."
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.6.png",
+                    "caption": "Lễ trao giải Style Up With ACFC - Những khoảnh khắc vinh danh đáng nhớ"
+                },
+                {
+                    "type": "text",
+                    "content": "Cảm ơn tất cả các thành viên đã cùng nhau tạo nên một sự kiện thành công ngoài mong đợi. Mong rằng chương trình đã tiếp thêm nguồn năng lượng tích cực, tinh thần \"dress up\" mỗi ngày đến tất cả mọi người!"
+                },
+                {
+                    "type": "text",
+                    "content": "Cùng ngắm nhìn lại một số khoảnh khắc ấn tượng, những tràng pháo tay cổ vũ nồng nhiệt và những khoảnh khắc đậm chất thời trang đã làm nên một buổi chiều đáng nhớ với anh chị em nhà ACFC & VFBS trong Fashion Day: Inside Wow nhé!"
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.7.png",
+                    "caption": "Những khoảnh khắc đáng nhớ tại Fashion Day Inside WOW"
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.8.png",
+                    "caption": "Tinh thần đoàn kết và nhiệt huyết của các thành viên ACFC & VFBS"
+                },
+                {
+                    "type": "image",
+                    "url": "image/1.9.png",
+                    "caption": "Những tác phẩm nghệ thuật độc đáo từ Workshop Draw Your Tee"
+                }
+            ],
+            
+            "createdAt": "2024-08-09T08:40:28.000Z",
+            "updatedAt": "2024-08-09T09:28:45.000Z"
+        };
+
+        // Load other news
+        function loadOtherNews() {
+            const otherNewsContainer = document.getElementById('other-news');
+            
+            otherNewsData.forEach(news => {
+                const newsItem = document.createElement('div');
+                newsItem.className = 'grid-item';
+                newsItem.innerHTML = `
+                    <div class="grid-image">
+                        <img src="${news.image}" alt="${news.title}">
+                    </div>
+                    <a href="#" class="grid-title">${news.title}</a>
+                    <div class="grid-date">Ngày đăng ${news.date}</div>
+                    <div class="grid-excerpt">${news.excerpt}</div>
+                `;
+                otherNewsContainer.appendChild(newsItem);
+            });
+        }
+
+        // Load article data
+        function loadArticle() {
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('main-content').style.display = 'grid';
+                
+                // Populate header
+                document.getElementById('thumbnail').src = articleData.thumbnailUrl;
+                document.getElementById('thumbnail').alt = articleData.thumbnailCaption || articleData.title;
+                document.getElementById('article-title').textContent = articleData.title;
+                document.getElementById('publish-date').textContent = `Ngày đăng: ${formatDate(articleData.publishedAt)}`;
+                
+                // Populate interleaved content
+                const articleBody = document.getElementById('article-body');
+                articleData.contentBlocks.forEach((block, index) => {
+                    const blockElement = document.createElement('div');
+                    blockElement.className = 'content-block';
+                    
+                    if (block.type === 'text') {
+                        blockElement.innerHTML = `<div class="content-text">${block.content}</div>`;
+                    } else if (block.type === 'image') {
+                        blockElement.innerHTML = `
+                            <img src="${block.url}" alt="${block.caption}" class="article-image" onclick="openImageModal('${block.url}', '${block.caption}')">
+                            ${block.caption ? `<div class="image-caption">${block.caption}</div>` : ''}
+                        `;
+                    }
+                    
+                    articleBody.appendChild(blockElement);
+                });
+                
+                // Load other news
+                loadOtherNews();
+                
+            }, 1500);
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Share functions
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(articleData.title);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${title}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnTwitter() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(articleData.title);
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${title}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnLinkedIn() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(articleData.title);
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareViaEmail() {
+            const subject = encodeURIComponent(articleData.title);
+            const body = encodeURIComponent(`Tôi muốn chia sẻ bài viết này với bạn: ${window.location.href}`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        function shareOnPinterest() {
+            const url = encodeURIComponent(window.location.href);
+            const media = encodeURIComponent(articleData.thumbnailUrl);
+            const description = encodeURIComponent(articleData.title);
+            window.open(`https://pinterest.com/pin/create/button/?url=${url}&media=${media}&description=${description}`, '_blank', 'width=600,height=400');
+        }
+
+        // Image modal function
+        function openImageModal(src, caption) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.9);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+                cursor: pointer;
+                padding: 20px;
+            `;
+            
+            const img = document.createElement('img');
+            img.src = src;
+            img.style.cssText = `
+                max-width: 90%;
+                max-height: 80%;
+                object-fit: contain;
+                border-radius: 8px;
+                box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            `;
+            
+            const captionDiv = document.createElement('div');
+            captionDiv.textContent = caption;
+            captionDiv.style.cssText = `
+                color: white;
+                font-size: 1.2rem;
+                text-align: center;
+                margin-top: 20px;
+                max-width: 90%;
+                background: rgba(0,0,0,0.7);
+                padding: 15px 20px;
+                border-radius: 8px;
+            `;
+            
+            modal.appendChild(img);
+            modal.appendChild(captionDiv);
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+        }
+
+        // Go back function
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                alert('Không có trang trước đó để quay lại');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadArticle);
+    </script>
+</body>
+</html>
